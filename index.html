@@ -828,6 +828,25 @@ function showToast(msg) {
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
+
+// Expose functions to global scope for onclick handlers
+window.switchTab = switchTab;
+window.selectRadio = selectRadio;
+window.getRadio = getRadio;
+window.toggleBlock = toggleBlock;
+window.toggleExitReason = toggleExitReason;
+window.saveTrade = saveTrade;
+window.showErr = showErr;
+window.resetForm = resetForm;
+window.deleteTrade = deleteTrade;
+window.renderAll = renderAll;
+window.renderQuickStats = renderQuickStats;
+window.setFilter = setFilter;
+window.renderTradesList = renderTradesList;
+window.renderAnalytics = renderAnalytics;
+window.renderBarChart = renderBarChart;
+window.renderPnlChart = renderPnlChart;
+window.showToast = showToast;
 </script>
 </body>
 </html>
