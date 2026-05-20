@@ -166,6 +166,8 @@
     .trade-right{display:none;}
   }
 </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <div id="app">
@@ -422,12 +424,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script type="module">
-
-  // ===== FIREBASE =====
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyC_cGtk5lx-hNSFipYR3NhiBVcG2Rylge4",
     authDomain: "ibr-capital.firebaseapp.com",
@@ -438,9 +435,9 @@
     appId: "1:291751774227:web:afd1bf13ff627a8306d7e6"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const tradesRef = ref(db, 'trades');
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const tradesRef = db.ref('trades');
 
   let trades = [];
 let activeFilter = 'all';
@@ -472,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
   // Listen for real-time updates from Firebase
-  onValue(tradesRef, (snapshot) => {
+  tradesRef.on('value', (snapshot) => {
     trades = [];
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -562,7 +559,7 @@ function saveTrade() {
   };
 
   // Save to Firebase
-  push(tradesRef, trade).then(() => {
+  tradesRef.push(trade).then(() => {
     resetForm();
     showToast('УГОДУ ЗБЕРЕЖЕНО ✓');
   }).catch(err => {
@@ -592,8 +589,7 @@ function resetForm() {
 // DELETE
 function deleteTrade(firebaseKey) {
   if (!confirm('Видалити угоду?')) return;
-  const tradeRef = ref(db, 'trades/' + firebaseKey);
-  remove(tradeRef).catch(err => console.error(err));
+  db.ref('trades/' + firebaseKey).remove().catch(err => console.error(err));
 }
 
 // RENDER ALL
@@ -811,7 +807,7 @@ function renderPnlChart() {
 }
 
 // Connection status
-onValue(ref(db, '.info/connected'), (snap) => {
+db.ref('.info/connected').on('value', (snap) => {
   const el = document.getElementById('conn-status');
   if (!el) return;
   if (snap.val() === true) {
@@ -829,24 +825,6 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// Expose functions to global scope for onclick handlers
-window.switchTab = switchTab;
-window.selectRadio = selectRadio;
-window.getRadio = getRadio;
-window.toggleBlock = toggleBlock;
-window.toggleExitReason = toggleExitReason;
-window.saveTrade = saveTrade;
-window.showErr = showErr;
-window.resetForm = resetForm;
-window.deleteTrade = deleteTrade;
-window.renderAll = renderAll;
-window.renderQuickStats = renderQuickStats;
-window.setFilter = setFilter;
-window.renderTradesList = renderTradesList;
-window.renderAnalytics = renderAnalytics;
-window.renderBarChart = renderBarChart;
-window.renderPnlChart = renderPnlChart;
-window.showToast = showToast;
 </script>
 </body>
 </html>
